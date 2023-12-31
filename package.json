@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "http-server": "^14.1.1"
+  },
+  "name": "study-map",
+  "description": "",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": true,
+  "devDependencies": {},
+  "scripts": {
+    "start": "http-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chocolat0w0/study-map.git"
+  },
+  "author": "chocolat0w0",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chocolat0w0/study-map/issues"
+  },
+  "homepage": "https://github.com/chocolat0w0/study-map#readme"
+}
