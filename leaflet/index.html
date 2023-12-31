@@ -15,6 +15,17 @@
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
       crossorigin=""
     ></script>
+
+    <!-- Leaflet.markercluster -->
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
+    />
   </head>
   <body style="margin: 0">
     <div id="map" style="height: 80vh"></div>
@@ -88,20 +99,22 @@
       document.getElementById("geojsonForm").addEventListener("submit", (e) => {
         e.preventDefault();
 
-        const geojsonLayer = L.geoJSON(
-          JSON.parse(document.getElementById("geojsonContent").innerText)
-        );
-
+        // クラスタリングレイヤー作成
+        const clusterLayer = L.markerClusterGroup();
         if (document.getElementById("layerName").value) {
-          geojsonLayer.bindPopup(
+          clusterLayer.bindPopup(
             (layer) =>
               layer.feature.properties[
                 document.getElementById("layerName").value
               ]
           );
         }
+        clusterLayer.addTo(map);
 
-        geojsonLayer.addTo(map);
+        // クラスタリングレイヤーにGeoJSON追加
+        L.geoJSON(
+          JSON.parse(document.getElementById("geojsonContent").innerText)
+        ).addTo(clusterLayer);
       });
     </script>
   </body>
