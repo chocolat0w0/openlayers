@@ -22,6 +22,7 @@
     <script>
       // 地図初期化
       const map = L.map("map", {
+        // 緯度、軽度
         center: [35.3627808, 138.7307908],
         zoom: 14,
       });
@@ -81,7 +82,7 @@
       layersControl.addOverlay(square, "四角形");
 
       // 人工集中地区を読み込む
-      fetch("./data/A16-15_00_DID.geojson")
+      fetch("../data/A16-15_00_DID.geojson")
         .then((res) => res.json())
         .then((json) => {
           const polygon = L.geoJSON(json, {
@@ -98,7 +99,7 @@
         });
 
       // 鉄道を読み込む
-      fetch("./data/N02-20_RailroadSection.geojson")
+      fetch("../data/N02-20_RailroadSection.geojson")
         .then((res) => res.json())
         .then((json) => {
           // 事業者種別ごとの色
