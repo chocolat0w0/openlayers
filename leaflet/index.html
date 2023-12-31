@@ -19,8 +19,21 @@
   <body style="margin: 0">
     <div id="map" style="height: 80vh"></div>
 
-    <label for="geojson">Import GeoJSON</label>
-    <input type="file" name="geojson" id="geojson" accept=".geojson" />
+    <form id="geojsonForm">
+      <label for="geojson">GeoJSON File: </label>
+      <input type="file" name="geojson" id="geojson" accept=".geojson" />
+      <div
+        id="geojsonContent"
+        style="max-height: 10vh; overflow-y: scroll; font-size: 10px"
+      ></div>
+
+      <label for="layerName">The property key used as the layer name: </label>
+      <input type="text" name="layerName" id="layerName" />
+
+      <div>
+        <button type="submit">Add to map</button>
+      </div>
+    </form>
 
     <script>
       // 地図初期化
@@ -69,9 +82,26 @@
         const reader = new FileReader();
         reader.readAsText(file);
         reader.addEventListener("load", () => {
-          console.log(reader.result);
-          L.geoJSON(JSON.parse(reader.result)).addTo(map);
+          document.getElementById("geojsonContent").innerText = reader.result;
         });
+      });
+      document.getElementById("geojsonForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const geojsonLayer = L.geoJSON(
+          JSON.parse(document.getElementById("geojsonContent").innerText)
+        );
+
+        if (document.getElementById("layerName").value) {
+          geojsonLayer.bindPopup(
+            (layer) =>
+              layer.feature.properties[
+                document.getElementById("layerName").value
+              ]
+          );
+        }
+
+        geojsonLayer.addTo(map);
       });
     </script>
   </body>
