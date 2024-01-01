@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leaflet</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+  </head>
+  <body style="margin: 0">
+    <div id="map" style="height: 80vh"></div>
+
+    <script>
+      // 地図初期化
+      const map = L.map("map", {
+        center: [35, 135],
+        zoom: 4,
+      });
+
+      // 背景レイヤーを初期化
+      const backgroundLayer = L.tileLayer(
+        "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+          maxZoom: 19,
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        }
+      );
+
+      // 地図へレイヤー追加
+      map.addLayer(backgroundLayer);
+
+      // 画像ファイルを表示
+      const imageLayer = L.imageOverlay(
+        "../data/fuji.png",
+        [
+          // 左下緯度・経度、右上緯度・経度
+          [34.6978345, 138.067848],
+          [35.5478992, 139.039906],
+        ],
+        { opacity: 0.7 }
+      );
+      map.addLayer(imageLayer);
+    </script>
+  </body>
+</html>

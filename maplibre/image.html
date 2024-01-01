@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MapLibre GL JS</title>
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css"
+    />
+    <script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
+  </head>
+  <body style="margin: 0">
+    <div id="map" style="height: 80vh"></div>
+
+    <script>
+      const map = new maplibregl.Map({
+        container: "map",
+        center: [135, 35], // 軽度、緯度
+        zoom: 4,
+        style: {
+          version: 8,
+          sources: {
+            // データ定義
+            osm: {
+              type: "raster",
+              tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+              tileSize: 256, // タイル解像度
+              maxZoom: 19,
+              attribution:
+                '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            },
+            fuji: {
+              type: "image",
+              url: "../data/fuji.png",
+              coordinates: [
+                // 左上から時計回り
+                [138.2636861, 35.5478992],
+                [139.039906, 35.3994612],
+                [138.8376325, 34.6978345],
+                [138.067848, 34.8452742],
+              ],
+            },
+          },
+          //   データをレイヤーに追加
+          layers: [
+            { id: "osm-layer", source: "osm", type: "raster" },
+            {
+              id: "fuji-layer",
+              source: "fuji",
+              type: "raster",
+              paint: { "raster-opacity": 0.7 },
+            },
+          ],
+        },
+      });
+    </script>
+  </body>
+</html>
