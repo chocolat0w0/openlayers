@@ -13,6 +13,7 @@
   </head>
   <body style="margin: 0">
     <div id="map" style="height: 80vh"></div>
+    <p>Zoom: <span id="zoom"></span></p>
 
     <script>
       const map = new maplibregl.Map({
@@ -156,6 +157,17 @@
             },
           ],
         },
+      });
+
+      // コントローラー表示
+      const nav = new maplibregl.NavigationControl();
+      map.addControl(nav, "top-left");
+
+      // 現在のズームレベル表示
+      const zoomElem = document.getElementById("zoom");
+      zoomElem.innerHTML = map.getZoom();
+      map.on("zoom", () => {
+        zoomElem.innerHTML = map.getZoom();
       });
     </script>
   </body>
