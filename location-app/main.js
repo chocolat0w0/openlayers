@@ -157,7 +157,7 @@ const map = new maplibregl.Map({
         layout: { visibility: "none" },
       },
       {
-        id: "evacuation-layer",
+        id: "evacuation-flood-layer",
         source: "evacuation",
         "source-layer": "evacuation", // ベクトルタイル内のレイヤー名
         type: "circle",
@@ -167,13 +167,113 @@ const map = new maplibregl.Map({
           "circle-stroke-width": 1,
           "circle-stroke-color": "#fff",
         },
+        filter: ["==", 1, ["get", "flood"]],
+        layout: { visibility: "none" },
+      },
+      {
+        id: "evacuation-dosekiryu-layer",
+        source: "evacuation",
+        "source-layer": "evacuation", // ベクトルタイル内のレイヤー名
+        type: "circle",
+        paint: {
+          "circle-color": "#6666cc",
+          "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 2, 14, 6],
+          "circle-stroke-width": 1,
+          "circle-stroke-color": "#fff",
+        },
+        filter: ["==", 1, ["get", "dosekiryu"]],
+        layout: { visibility: "none" },
+      },
+      {
+        id: "evacuation-hightide-layer",
+        source: "evacuation",
+        "source-layer": "evacuation", // ベクトルタイル内のレイヤー名
+        type: "circle",
+        paint: {
+          "circle-color": "#6666cc",
+          "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 2, 14, 6],
+          "circle-stroke-width": 1,
+          "circle-stroke-color": "#fff",
+        },
+        filter: ["==", 1, ["get", "hightide"]],
+        layout: { visibility: "none" },
+      },
+      {
+        id: "evacuation-earthquake-layer",
+        source: "evacuation",
+        "source-layer": "evacuation", // ベクトルタイル内のレイヤー名
+        type: "circle",
+        paint: {
+          "circle-color": "#6666cc",
+          "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 2, 14, 6],
+          "circle-stroke-width": 1,
+          "circle-stroke-color": "#fff",
+        },
+        filter: ["==", 1, ["get", "earthquake"]],
+        layout: { visibility: "none" },
+      },
+      {
+        id: "evacuation-tsunami-layer",
+        source: "evacuation",
+        "source-layer": "evacuation", // ベクトルタイル内のレイヤー名
+        type: "circle",
+        paint: {
+          "circle-color": "#6666cc",
+          "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 2, 14, 6],
+          "circle-stroke-width": 1,
+          "circle-stroke-color": "#fff",
+        },
+        filter: ["==", 1, ["get", "tsunami"]],
+        layout: { visibility: "none" },
+      },
+      {
+        id: "evacuation-fire-layer",
+        source: "evacuation",
+        "source-layer": "evacuation", // ベクトルタイル内のレイヤー名
+        type: "circle",
+        paint: {
+          "circle-color": "#6666cc",
+          "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 2, 14, 6],
+          "circle-stroke-width": 1,
+          "circle-stroke-color": "#fff",
+        },
+        filter: ["==", 1, ["get", "fire"]],
+        layout: { visibility: "none" },
+      },
+      {
+        id: "evacuation-inlandflood-layer",
+        source: "evacuation",
+        "source-layer": "evacuation", // ベクトルタイル内のレイヤー名
+        type: "circle",
+        paint: {
+          "circle-color": "#6666cc",
+          "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 2, 14, 6],
+          "circle-stroke-width": 1,
+          "circle-stroke-color": "#fff",
+        },
+        filter: ["==", 1, ["get", "inlandflood"]],
+        layout: { visibility: "none" },
+      },
+      {
+        id: "evacuation-volcano-layer",
+        source: "evacuation",
+        "source-layer": "evacuation", // ベクトルタイル内のレイヤー名
+        type: "circle",
+        paint: {
+          "circle-color": "#6666cc",
+          "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 2, 14, 6],
+          "circle-stroke-width": 1,
+          "circle-stroke-color": "#fff",
+        },
+        filter: ["==", 1, ["get", "volcano"]],
+        layout: { visibility: "none" },
       },
     ],
   },
 });
 
 map.on("load", () => {
-  const opacity = new OpacityControl({
+  const hazardControl = new OpacityControl({
     baseLayers: {
       "flood-layer": "洪水浸水想定区域（想定最大規模）",
       "hightide-layer": "高潮浸水想定区域",
@@ -183,5 +283,19 @@ map.on("load", () => {
       "jisuberi-layer": "土砂災害警戒区域（地すべり）",
     },
   });
-  map.addControl(opacity, "top-left");
+  map.addControl(hazardControl, "top-left");
+
+  const evacuationControl = new OpacityControl({
+    baseLayers: {
+      "evacuation-flood-layer": "洪水",
+      "evacuation-dosekiryu-layer": "崖崩れ/土石流/地滑り",
+      "evacuation-hightide-layer": "高潮",
+      "evacuation-earthquake-layer": "地震",
+      "evacuation-tsunami-layer": "津波",
+      "evacuation-fire-layer": "大規模な火事",
+      "evacuation-inlandflood-layer": "内水氾濫",
+      "evacuation-volcano-layer": "火山現象",
+    },
+  });
+  map.addControl(evacuationControl, "top-left");
 });
