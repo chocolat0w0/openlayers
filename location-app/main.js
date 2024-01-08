@@ -298,4 +298,75 @@ map.on("load", () => {
     },
   });
   map.addControl(evacuationControl, "top-left");
+
+  map.on("mousemove", (e) => {
+    const features = map.queryRenderedFeatures(e.point, {
+      layers: [
+        "evacuation-flood-layer",
+        "evacuation-dosekiryu-layer",
+        "evacuation-hightide-layer",
+        "evacuation-earthquake-layer",
+        "evacuation-tsunami-layer",
+        "evacuation-fire-layer",
+        "evacuation-inlandflood-layer",
+        "evacuation-volcano-layer",
+      ],
+    });
+    if (features.length > 0) {
+      map.getCanvas().style.cursor = "pointer";
+    } else {
+      map.getCanvas().style.cursor = "";
+    }
+  });
+
+  map.on("click", (e) => {
+    const features = map.queryRenderedFeatures(e.point, {
+      layers: [
+        "evacuation-flood-layer",
+        "evacuation-dosekiryu-layer",
+        "evacuation-hightide-layer",
+        "evacuation-earthquake-layer",
+        "evacuation-tsunami-layer",
+        "evacuation-fire-layer",
+        "evacuation-inlandflood-layer",
+        "evacuation-volcano-layer",
+      ],
+    });
+    if (features.length === 0) return;
+    const feature = features[0];
+    const popup = new maplibregl.Popup()
+      .setLngLat(feature.geometry.coordinates)
+      .setHTML(
+        `
+      <div style="font-weight: 900;">${feature.properties.name}</div>
+      <div>${feature.properties.address}</div>
+      <div>${feature.properties.remarks ?? ""}</div>
+      <span${
+        feature.properties.flood ? "" : ' style="color: #ccc;"'
+      }>洪水</span>
+      <span${
+        feature.properties.dosekiryu ? "" : ' style="color: #ccc;"'
+      }>崖崩れ/土石流/地滑り</span>
+      <span${
+        feature.properties.hightide ? "" : ' style="color: #ccc;"'
+      }>高潮</span>
+      <span${
+        feature.properties.earthquake ? "" : ' style="color: #ccc;"'
+      }>地震</span>
+      <span${
+        feature.properties.tsunami ? "" : ' style="color: #ccc;"'
+      }>津波</span>
+      <span${
+        feature.properties.fire ? "" : ' style="color: #ccc;"'
+      }>大規模な火事</span>
+      <span${
+        feature.properties.inlandflood ? "" : ' style="color: #ccc;"'
+      }>内水氾濫</span>
+      <span${
+        feature.properties.volcano ? "" : ' style="color: #ccc;"'
+      }>火山現象</span>
+      `
+      )
+      .addTo(map);
+  });
 });
