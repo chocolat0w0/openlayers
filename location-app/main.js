@@ -2,6 +2,7 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import OpacityControl from "maplibre-gl-opacity";
 import "maplibre-gl-opacity/dist/maplibre-gl-opacity.css";
+import distance from "@turf/distance";
 
 const map = new maplibregl.Map({
   container: "map",
@@ -106,6 +107,14 @@ const map = new maplibregl.Map({
         maxzoom: 8,
         attribution:
           '<a href="https://www.gsi.go.jp/bousaichiri/hinanbasho.html">国土地理院:指定緊急避難場所データ</a>',
+      },
+      // 現在地と最寄りの避難所を結ぶ線
+      route: {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: [],
+        },
       },
     },
     layers: [
@@ -268,9 +277,64 @@ const map = new maplibregl.Map({
         filter: ["==", 1, ["get", "volcano"]],
         layout: { visibility: "none" },
       },
+      {
+        id: "route-layer",
+        source: "route",
+        type: "line",
+        paint: {
+          "line-color": "#3af",
+          "line-width": 4,
+        },
+      },
     ],
   },
 });
+
+let userLocation = null;
+const geolocationControl = new maplibregl.GeolocateControl({
+  trackUserLocation: true,
+});
+map.addControl(geolocationControl, "bottom-right");
+geolocationControl.on("geolocate", (e) => {
+  userLocation = [e.coords.longitude, e.coords.latitude];
+});
+
+// 現在表示中の避難所レイヤーを探すフィルタ
+const getCurrentEvacuationLayerFilter = () => {
+  const style = map.getStyle();
+  const layers = style.layers.filter((layer) =>
+    layer.id.startsWith("evacuation")
+  );
+  const visibleLayers = layers.filter(
+    (layer) => layer.layout.visibility === "visible"
+  );
+  return visibleLayers[0].filter;
+};
+
+const getNearestEvacuation = (lon, lat) => {
+  const currentEvacuationLayerFilter = getCurrentEvacuationLayerFilter();
+  // 表示中のレイヤー内の地物
+  const features = map.querySourceFeatures("evacuation", {
+    sourceLayer: "evacuation",
+    filter: currentEvacuationLayerFilter,
+  });
+
+  const nearestFeature = features.reduce((minDistFeature, feature) => {
+    const dist = distance([lon, lat], feature.geometry.coordinates);
+    if (minDistFeature === null || minDistFeature.properties.dist > dist) {
+      return {
+        ...feature,
+        properties: {
+          ...feature.properties,
+          dist,
+        },
+      };
+    } else {
+      return minDistFeature;
+    }
+  }, null);
+  return nearestFeature;
+};
 
 map.on("load", () => {
   const hazardControl = new OpacityControl({
@@ -334,7 +398,7 @@ map.on("load", () => {
     });
     if (features.length === 0) return;
     const feature = features[0];
-    const popup = new maplibregl.Popup()
+    new maplibregl.Popup()
       .setLngLat(feature.geometry.coordinates)
       .setHTML(
         `
@@ -369,9 +433,34 @@ map.on("load", () => {
       )
       .addTo(map);
   });
-});
 
-const geolocationControl = new maplibregl.GeolocateControl({
-  trackUserLocation: true,
+  map.on("render", () => {
+    // GeolocationControlがオフの場合は現在位置消去
+    if (geolocationControl._watchState === "OFF") userLocation = null;
+
+    if (map.getZoom() < 7 || userLocation === null) {
+      map.getSource("route").setData({
+        type: "FeatureCollection",
+        features: [],
+      });
+      return;
+    }
+
+    const nearestFeature = getNearestEvacuation(
+      userLocation[0],
+      userLocation[1]
+    );
+    map.getSource("route").setData({
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          geometry: {
+            type: "LineString",
+            coordinates: [userLocation, nearestFeature._geometry.coordinates],
+          },
+        },
+      ],
+    });
+  });
 });
-map.addControl(geolocationControl, "bottom-right");
