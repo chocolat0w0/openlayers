@@ -482,4 +482,11 @@ map.on("load", () => {
     },
     "jisuberi-layer" // どのレイヤーの手前に追加するか
   );
+
+  map.addControl(
+    new maplibregl.TerrainControl({
+      source: "terrain",
+      exaggeration: 1, // 標高を強調する倍率
+    })
+  );
 });
