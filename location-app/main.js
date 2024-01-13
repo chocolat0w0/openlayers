@@ -3,6 +3,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import OpacityControl from "maplibre-gl-opacity";
 import "maplibre-gl-opacity/dist/maplibre-gl-opacity.css";
 import distance from "@turf/distance";
+import { useGsiTerrainSource } from "maplibre-gl-gsi-terrain"; // 地理院標高タイル
 
 const map = new maplibregl.Map({
   container: "map",
@@ -463,4 +464,22 @@ map.on("load", () => {
       ],
     });
   });
+
+  // 地理院標高データ追加 (type="raster-dem")
+  const gsiTerrainSource = useGsiTerrainSource(maplibregl.addProtocol);
+  map.addSource("terrain", gsiTerrainSource);
+
+  // 地理院標高から陰影図を追加
+  map.addLayer(
+    {
+      id: "hillshade",
+      source: "terrain",
+      type: "hillshade",
+      paint: {
+        "hillshade-illumination-anchor": "map", // 陰影の方向基準
+        "hillshade-exaggeration": 0.2, // 陰影の強さ
+      },
+    },
+    "jisuberi-layer" // どのレイヤーの手前に追加するか
+  );
 });
