@@ -1,0 +1,62 @@
+# 参照：https://docs.github.com/ja/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages
+name: GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: location-app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        name: Setup node
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: location-app/package-lock.json
+
+      - run: npm install && npm run build
+        name: Build
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v3
+
+      - uses: actions/upload-pages-artifact@v1
+        name: Upload artifact
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write # to deploy to Pages
+      id-token: write # to verify the deployment originates from an appropriate source
+
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    # Specify runner + deployment step
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4 # or specific "vX.X.X" version tag for this action
+
